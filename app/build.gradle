@@ -31,4 +31,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.microsoft.cognitiveservices.speech:client-sdk:1.2.0'
+    implementation 'com.ibm.watson.developer_cloud:android-sdk:0.5.0'
+    implementation 'com.ibm.watson.developer_cloud:visual-recognition:6.1.1'
+    implementation ('com.ibm.mobilefirstplatform.clientsdk.android:core:[2.0.0,3.0.0)')
+    implementation 'com.google.android:flexbox:1.0.0'
+    implementation 'com.squareup.okhttp:okhttp:2.5.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
 }

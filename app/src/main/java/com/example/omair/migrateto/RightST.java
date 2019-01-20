@@ -6,20 +6,36 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
+import com.microsoft.cognitiveservices.speech.*;
+import com.microsoft.cognitiveservices.speech.audio.*;
+import com.microsoft.cognitiveservices.speech.translation.*;
+import com.google.gson.*;
+import com.squareup.okhttp.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
+
+import static android.Manifest.permission.INTERNET;
+import static android.Manifest.permission.RECORD_AUDIO;
 
 public class RightST extends AppCompatActivity {
+
+    static private String Fname;
 
     public class WavRecorder {
         private static final int RECORDER_BPP = 16;
@@ -138,6 +154,8 @@ public class RightST extends AppCompatActivity {
                 recordingThread = null;
             }
 
+            Fname=getFilename();
+
             copyWaveFile(getTempFilename(), getFilename());
             deleteTempFile();
         }
@@ -236,18 +254,14 @@ public class RightST extends AppCompatActivity {
         }
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_right_st);
-
-        final Button button = (Button) findViewById(R.id.button1);
-        button.setText("Start");
+        Button button = (Button) findViewById(R.id.button1);
         button.setOnClickListener(new View.OnClickListener() {
-            WavRecorder wavRecorder = new WavRecorder("file.wav");
-            Boolean alt = true;
-            @Override
-            public void onClick(View view) {
+            public void onClick(View view) {/*
                 if (alt){
                     wavRecorder.startRecording();
                     button.setText("Stop");
@@ -255,7 +269,38 @@ public class RightST extends AppCompatActivity {
                 }else{
                     wavRecorder.stopRecording();
                     button.setText("Start");
+                    translationWithFileAsync();
                     alt=!alt;
+                }*/
+                TextView txt = (TextView) findViewById(R.id.textView2);
+                TextView txt1 = (TextView) findViewById(R.id.textView3);// 'hello' is the ID of your text view
+                try {
+                    SpeechConfig config = SpeechConfig.fromSubscription("2bbf1349d3524f428b82d00aca4ea93a", "EastUS");
+                    assert(config != null);
+
+                    SpeechRecognizer reco = new SpeechRecognizer(config);
+                    assert(reco != null);
+
+                    Future<SpeechRecognitionResult> task = reco.recognizeOnceAsync();
+                    assert(task != null);
+
+                    // Note: this will block the UI thread, so eventually, you want to
+                    //        register for the event (see full samples)
+                    SpeechRecognitionResult result = task.get();
+                    assert(result != null);
+
+                    if (result.getReason() == ResultReason.RecognizedSpeech) {
+                        String ans = result.toString().substring(result.toString().indexOf('<')+1,result.toString().length()-2);
+                        txt.setText(ans);
+                    }
+                    else {
+                        txt.setText("Error recognizing. Did you update the subscription info?" + System.lineSeparator() + result.toString());
+                    }
+
+                    reco.close();
+                } catch (Exception ex) {
+                    Log.e("SpeechSDKDemo", "unexpected " + ex.getMessage());
+                    assert(false);
                 }
             }
         });

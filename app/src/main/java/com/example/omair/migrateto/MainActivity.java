@@ -31,6 +31,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        Button bCam = (Button) findViewById(R.id.button3);
+        bCam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, Cam.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public void checkPermission(){
@@ -45,6 +54,12 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.RECORD_AUDIO},
                     124);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) !=
+                PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.INTERNET},
+                    125);
         }
     }
 }
